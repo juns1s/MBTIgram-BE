@@ -1,4 +1,4 @@
-package com.Zizon.MBTInstagram.global.mbti;
+package com.Zizon.MBTInstagram.global.embedded;
 
 public enum MbtiType {
 
