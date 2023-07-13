@@ -10,3 +10,5 @@ logging:
 
 Python:
   url: "http://localhost:8081/"
+CORS:
+  urls: "http://localhost:3000"
