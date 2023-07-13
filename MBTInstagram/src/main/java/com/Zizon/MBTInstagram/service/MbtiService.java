@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
 @Service
@@ -32,16 +33,16 @@ public class MbtiService {
         requestDto.setSnsUrl(url);
         String params = objectMapper.writeValueAsString(requestDto);
 
-        // HttpEntity에 헤더 및 params 설정
-        HttpEntity entity = new HttpEntity(params, httpHeaders);
+        // HttpEntity에 헤더 설정
+        HttpEntity entity = new HttpEntity(httpHeaders);
 
-        // RestTemplate의 exchange 메소드를 통해 URL에 HttpEntity와 함께 요청
+        // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.exchange(pythonServerUrl+snsType.getSnsType(), HttpMethod.POST,
-                entity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+                pythonServerUrl + snsType.getSnsType() + "?url=" + URLEncoder.encode(params, "UTF-8"), String.class);
 
         // 요청 후 응답 확인
-        log.info("SNS URL: "+url);
+        log.info("SNS URL: " + url);
         log.info(responseEntity.getBody());
 
         // String to Object
