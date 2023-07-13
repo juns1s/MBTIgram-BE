@@ -22,7 +22,7 @@ public class MbtiController {
     private final MbtiService mbtiService;
 
     @GetMapping("/sns/instagram")
-    public ResponseEntity instagramPredict(@Valid @RequestBody MbtiRequestDto dto){
+    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestBody MbtiRequestDto dto){
         try{
             String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, dto.getSnsUrl());
 
@@ -32,12 +32,12 @@ public class MbtiController {
             response.setSuccess(true);
             response.setMessage("인스타그램 mbti 분석 성공");
             response.setMbti(mbti);
-            return new ResponseEntity(response, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
         }catch (Exception e) {
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(400, false, "계정 조회 불가");
-            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 }
