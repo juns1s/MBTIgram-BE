@@ -3,10 +3,7 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
 
-logging:
-  level:
-    org.hibernate.SQL : debug
-#    org.hibernate.type: trace
-
 Python:
   url: "http://localhost:8081/"
+CORS:
+  urls: "http://localhost:3000"
