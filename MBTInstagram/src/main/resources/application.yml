@@ -1,19 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:h2:tcp://localhost/~/MBTInstagram
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        default_batch_fetch_size: 100
-        format_sql: true
-    open-in-view: false
-
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -22,3 +7,6 @@ logging:
   level:
     org.hibernate.SQL : debug
 #    org.hibernate.type: trace
+
+Python:
+  url: "http://localhost:8081/"
