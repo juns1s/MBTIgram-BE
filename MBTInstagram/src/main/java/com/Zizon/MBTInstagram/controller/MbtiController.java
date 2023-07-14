@@ -20,9 +20,9 @@ public class MbtiController {
     private final MbtiService mbtiService;
 
     @GetMapping("/sns/instagram")
-    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String url){
+    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestBody MbtiRequestDto dto){
         try{
-            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, url);
+            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, dto.getSnsUrl());
 
             MbtiPredictedDto response = new MbtiPredictedDto();
             response.setStatus(200);
