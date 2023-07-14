@@ -45,6 +45,6 @@ public class MbtiController {
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
     public void healthCheck(){
-
+        log.info("Health Checked");
     }
 }
