@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +20,9 @@ public class MbtiController {
     private final MbtiService mbtiService;
 
     @GetMapping("/sns/instagram")
-    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestBody MbtiRequestDto dto){
+    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String url){
         try{
-            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, dto.getSnsUrl());
+            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, url);
 
             MbtiPredictedDto response = new MbtiPredictedDto();
             response.setStatus(200);
