@@ -39,7 +39,7 @@ public class MbtiService {
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-                pythonServerUrl + snsType.getSnsType() + "?url=" + URLEncoder.encode(params, "UTF-8"), String.class);
+                pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + URLEncoder.encode(params, "UTF-8"), String.class);
 
         // 요청 후 응답 확인
         log.info("SNS URL: " + url);

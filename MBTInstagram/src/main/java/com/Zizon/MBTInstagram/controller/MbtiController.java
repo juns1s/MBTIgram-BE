@@ -1,6 +1,5 @@
 package com.Zizon.MBTInstagram.controller;
 
-import com.Zizon.MBTInstagram.requestDto.MbtiRequestDto;
 import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
 import com.Zizon.MBTInstagram.responseDto.MbtiPredictedDto;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
@@ -20,9 +19,9 @@ public class MbtiController {
     private final MbtiService mbtiService;
 
     @GetMapping("/sns/instagram")
-    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String url){
+    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
-            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, url);
+            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, snsUrl);
 
             MbtiPredictedDto response = new MbtiPredictedDto();
             response.setStatus(200);
