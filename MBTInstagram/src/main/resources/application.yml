@@ -6,4 +6,4 @@ spring:
 Python:
   url: "http://localhost:8081/"
 CORS:
-  urls: "http://localhost:3000"
+  urls: "https://stately-florentine-57e556.netlify.app/"
