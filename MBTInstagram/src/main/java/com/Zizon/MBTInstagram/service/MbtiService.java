@@ -2,6 +2,7 @@ package com.Zizon.MBTInstagram.service;
 
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.requestDto.MbtiRequestDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
 @Service
@@ -22,6 +22,9 @@ public class MbtiService {
     private String pythonServerUrl;
 
     public String predictMbti(SnsType snsType, String url) throws Exception{
+
+        log.info("SNS URL: " + url);
+
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -32,6 +35,8 @@ public class MbtiService {
         // Object Mapper를 통한 JSON 바인딩
         requestDto.setSnsUrl(url);
         String params = objectMapper.writeValueAsString(requestDto);
+        JsonNode jsonNode = objectMapper.readTree(params);
+        String snsUrl = jsonNode.get("snsUrl").asText();
 
         // HttpEntity에 헤더 설정
         HttpEntity entity = new HttpEntity(httpHeaders);
@@ -39,10 +44,9 @@ public class MbtiService {
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-                pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + URLEncoder.encode(params, "UTF-8"), String.class);
+                pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + snsUrl, String.class);
 
         // 요청 후 응답 확인
-        log.info("SNS URL: " + url);
         log.info(responseEntity.getBody());
 
         // String to Object
