@@ -4,6 +4,6 @@ spring:
     suffix: .html
 
 Python:
-  url: "http://localhost:8081/"
+  url: "http://localhost:5000/"
 CORS:
   urls: "https://stately-florentine-57e556.netlify.app/"
