@@ -51,6 +51,9 @@ public class MbtiService {
 
         // String to Object
         TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
+        if(response.mbti.equals("error")){
+            throw new RuntimeException();
+        }
         return response.mbti;
     }
 

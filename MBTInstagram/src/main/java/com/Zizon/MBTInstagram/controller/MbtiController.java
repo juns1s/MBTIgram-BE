@@ -31,9 +31,13 @@ public class MbtiController {
             response.setMbti(mbti);
             return new ResponseEntity<>(response, HttpStatus.OK);
 
-        }catch (Exception e) {
+        }catch (RuntimeException e) {
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(400, false, "계정 조회 불가");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
