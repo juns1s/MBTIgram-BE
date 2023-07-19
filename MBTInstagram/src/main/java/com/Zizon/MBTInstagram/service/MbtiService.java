@@ -48,12 +48,17 @@ public class MbtiService {
 
         // 요청 후 응답 확인
         log.info(responseEntity.getBody());
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        if(statusCode.is4xxClientError()){
+            throw new NoSuchFieldException();
+        }
+        else if(statusCode.is5xxServerError()){
+            throw new RuntimeException();
+        }
 
         // String to Object
         TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
-        if(response.mbti.equals("error")){
-            throw new RuntimeException();
-        }
+
         return response.mbti;
     }
 
