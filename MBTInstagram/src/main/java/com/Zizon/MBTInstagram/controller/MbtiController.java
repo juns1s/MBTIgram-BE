@@ -1,6 +1,8 @@
 package com.Zizon.MBTInstagram.controller;
 
+import com.Zizon.MBTInstagram.global.exception.CustomException;
 import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
+import com.Zizon.MBTInstagram.responseDto.ExceptionDto;
 import com.Zizon.MBTInstagram.responseDto.MbtiPredictedDto;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.service.MbtiService;
@@ -31,24 +33,22 @@ public class MbtiController {
             response.setMbti(mbti);
             return new ResponseEntity<>(response, HttpStatus.OK);
 
-        }catch (NoSuchFieldException e) {
-            log.error(e.getMessage());
-            ApiResponseDto response = new ApiResponseDto(400, false, "계정 조회 불가");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }catch (CustomException e) {
+            log.error(String.valueOf((e.getHttpStatus())));
+            ApiResponseDto response = new ExceptionDto(e.getHttpStatus(), e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
         } catch (RuntimeException e) {
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e){
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
-    public void healthCheck(){
-//        log.info("Health Checked");
-    }
+    public void healthCheck(){}
 }

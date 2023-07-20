@@ -1,6 +1,9 @@
 package com.Zizon.MBTInstagram.service;
 
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
+import com.Zizon.MBTInstagram.global.exception.NoAccountException;
+import com.Zizon.MBTInstagram.global.exception.NoPostException;
+import com.Zizon.MBTInstagram.global.exception.PrivateAccountException;
 import com.Zizon.MBTInstagram.requestDto.MbtiRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +14,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +24,13 @@ public class MbtiService {
     @Value("${Python.url}")
     private String pythonServerUrl;
 
-    public String predictMbti(SnsType snsType, String url) throws Exception{
+    public String predictMbti(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         MbtiRequestDto requestDto = new MbtiRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,28 +41,36 @@ public class MbtiService {
         JsonNode jsonNode = objectMapper.readTree(params);
         String snsUrl = jsonNode.get("snsUrl").asText();
 
-        // HttpEntity에 헤더 설정
-        HttpEntity entity = new HttpEntity(httpHeaders);
-
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-                pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + snsUrl, String.class);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+                    pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + snsUrl, String.class);
 
-        // 요청 후 응답 확인
-        log.info(responseEntity.getBody());
-        HttpStatusCode statusCode = responseEntity.getStatusCode();
-        if(statusCode.is4xxClientError()){
-            throw new NoSuchFieldException();
+            // 요청 후 응답 확인
+            log.info(responseEntity.getBody());
+
+            // String to Object
+            TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
+
+            return response.mbti;
+        } catch (Exception e) {
+            String httpStatus = e.getMessage().substring(0,3);
+
+            if(httpStatus.equals("400")){
+                throw new NoPostException();
+            }
+            else if(httpStatus.equals("404")){
+                throw new NoAccountException();
+            }
+            else if(httpStatus.equals("401")){
+                throw new PrivateAccountException();
+            }
+            else if(httpStatus.equals("500")){
+                throw new RuntimeException();
+            }
         }
-        else if(statusCode.is5xxServerError()){
-            throw new RuntimeException();
-        }
-
-        // String to Object
-        TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
-
-        return response.mbti;
+        return null;
     }
 
     private static class TestResponse{
