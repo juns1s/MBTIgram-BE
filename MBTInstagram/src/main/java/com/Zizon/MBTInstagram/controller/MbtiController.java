@@ -23,7 +23,7 @@ public class MbtiController {
     @GetMapping("/sns/instagram")
     public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
-            String mbti = mbtiService.predictMbti(SnsType.INSTAGRAM, snsUrl);
+            String mbti = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
 
             MbtiPredictedDto response = new MbtiPredictedDto();
             response.setStatus(200);
@@ -41,6 +41,25 @@ public class MbtiController {
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/sns/introduction")
+    public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) throws Exception {
+        try{
+            String mbti = mbtiService.predictMbtiByText(text);
+
+            MbtiPredictedDto response = new MbtiPredictedDto();
+            response.setStatus(200);
+            response.setSuccess(true);
+            response.setSuccess(true);
+            response.setMessage("인스타그램 mbti 분석 성공");
+            response.setMbti(mbti);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
