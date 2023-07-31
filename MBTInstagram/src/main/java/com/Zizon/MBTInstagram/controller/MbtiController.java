@@ -37,10 +37,6 @@ public class MbtiController {
             log.error(String.valueOf((e.getHttpStatus())));
             ApiResponseDto response = new ExceptionDto(e.getHttpStatus(), e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e){
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
@@ -49,7 +45,7 @@ public class MbtiController {
     }
 
     @GetMapping("/sns/introduction")
-    public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) throws Exception {
+    public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
             String mbti = mbtiService.predictMbtiByText(text);
 
