@@ -1,2 +1,7 @@
-# Zizon-Ulzzang-BE
-SPP zㅣ존얼짱s2 백엔드 레포
+# MBTIgram Spring Boot server
+## 개요
+MBTIgram 웹 서비스의 메인 서버이다.
+
+플라스크 서버: <https://github.com/SPP-Zizon-Ulzzang/Zizon-Ulzzang-Flask>
+## 서비스 구조
+![프로젝트_구조](https://github.com/SPP-Zizon-Ulzzang/Zizon-Ulzzang-Flask/assets/50133922/f3a749f5-bd33-4e66-9c1c-62559b72e1fd)
