@@ -30,10 +30,6 @@ public class MbtiService {
 
         log.info("SNS URL: " + url);
 
-        //헤더 설정
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
         MbtiInstagramRequestDto requestDto = new MbtiInstagramRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -77,10 +73,6 @@ public class MbtiService {
 
     public FlaskResponseDto predictMbtiByText(String text) throws Exception {
         log.info("Text: " + text);
-
-        //헤더 설정
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         MbtiTextRequestDto requestDto = new MbtiTextRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
