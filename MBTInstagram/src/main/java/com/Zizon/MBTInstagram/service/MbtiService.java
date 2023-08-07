@@ -1,11 +1,12 @@
 package com.Zizon.MBTInstagram.service;
 
+import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.global.exception.NoAccountException;
 import com.Zizon.MBTInstagram.global.exception.NoPostException;
 import com.Zizon.MBTInstagram.global.exception.PrivateAccountException;
-import com.Zizon.MBTInstagram.requestDto.MbtiInstagramRequestDto;
-import com.Zizon.MBTInstagram.requestDto.MbtiTextRequestDto;
+import com.Zizon.MBTInstagram.flaskDto.MbtiInstagramRequestDto;
+import com.Zizon.MBTInstagram.flaskDto.MbtiTextRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class MbtiService {
     @Value("${Python.url}")
     private String pythonServerUrl;
 
-    public String predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
+    public FlaskResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
 
@@ -51,10 +52,10 @@ public class MbtiService {
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
 
-            // String to Object
-            TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
+            // JSON을 클래스로 변경
+            FlaskResponseDto response = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
 
-            return response.mbti;
+            return response;
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
@@ -74,7 +75,7 @@ public class MbtiService {
         return null;
     }
 
-    public String predictMbtiByText(String text) throws Exception {
+    public FlaskResponseDto predictMbtiByText(String text) throws Exception {
         log.info("Text: " + text);
 
         //헤더 설정
@@ -100,9 +101,9 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // String to Object
-            TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
+            FlaskResponseDto response = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
 
-            return response.mbti;
+            return response;
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
@@ -111,9 +112,5 @@ public class MbtiService {
             }
         }
         return null;
-    }
-
-    private static class TestResponse{
-        public String mbti;
     }
 }
