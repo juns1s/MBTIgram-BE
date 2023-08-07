@@ -14,6 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -63,7 +68,18 @@ public class MbtiController {
         response.setSuccess(true);
         response.setMessage("인스타그램 mbti 분석 성공");
         response.setMbti(predictResult.getMbti());
-        response.setProb(predictResult.getProb());
+        response.setProb(sortByValuesDescending(predictResult.getProb()));
+        System.out.println(sortByValuesDescending(predictResult.getProb()));
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public static Map<String, Double> sortByValuesDescending(Map<String, Double> map) {
+        List<Map.Entry<String, Double>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.<String, Double>comparingByValue().reversed());
+        Map<String, Double> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
     }
 }
