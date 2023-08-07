@@ -49,23 +49,18 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // JSON을 클래스로 변경
-            FlaskResponseDto response = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
 
-            return response;
+            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
-            if(httpStatus.equals("400")){
-                throw new NoPostException();
-            }
-            else if(httpStatus.equals("404")){
-                throw new NoAccountException();
-            }
-            else if(httpStatus.equals("401")){
-                throw new PrivateAccountException();
-            }
-            else if(httpStatus.equals("500")){
-                throw new RuntimeException();
+            switch (httpStatus) {
+                case "400" -> throw new NoPostException();
+                case "404" -> throw new NoAccountException();
+                case "401" -> throw new PrivateAccountException();
+                case "500" -> throw new RuntimeException();
+                default -> {
+                }
             }
         }
         return null;
@@ -93,9 +88,8 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // String to Object
-            FlaskResponseDto response = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
 
-            return response;
+            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
