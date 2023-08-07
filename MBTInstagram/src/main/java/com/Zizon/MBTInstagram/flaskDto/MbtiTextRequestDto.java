@@ -1,4 +1,4 @@
-package com.Zizon.MBTInstagram.requestDto;
+package com.Zizon.MBTInstagram.flaskDto;
 
 public class MbtiTextRequestDto {
     private String text;
