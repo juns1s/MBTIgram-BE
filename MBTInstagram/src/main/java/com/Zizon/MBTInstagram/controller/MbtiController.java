@@ -1,5 +1,6 @@
 package com.Zizon.MBTInstagram.controller;
 
+import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
 import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
 import com.Zizon.MBTInstagram.responseDto.ExceptionDto;
@@ -23,15 +24,9 @@ public class MbtiController {
     @GetMapping("/sns/instagram")
     public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
-            String mbti = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
+            FlaskResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
 
-            MbtiPredictedDto response = new MbtiPredictedDto();
-            response.setStatus(200);
-            response.setSuccess(true);
-            response.setSuccess(true);
-            response.setMessage("인스타그램 mbti 분석 성공");
-            response.setMbti(mbti);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return responsePredictResult(predictResult);
 
         }catch (CustomException e) {
             log.error(String.valueOf((e.getHttpStatus())));
@@ -47,15 +42,9 @@ public class MbtiController {
     @GetMapping("/sns/introduction")
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
-            String mbti = mbtiService.predictMbtiByText(text);
+            FlaskResponseDto predictResult = mbtiService.predictMbtiByText(text);
 
-            MbtiPredictedDto response = new MbtiPredictedDto();
-            response.setStatus(200);
-            response.setSuccess(true);
-            response.setSuccess(true);
-            response.setMessage("인스타그램 mbti 분석 성공");
-            response.setMbti(mbti);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return responsePredictResult(predictResult);
         } catch (Exception e){
             log.error(e.getMessage());
             ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
@@ -66,4 +55,15 @@ public class MbtiController {
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
     public void healthCheck(){}
+
+    private ResponseEntity<ApiResponseDto> responsePredictResult(FlaskResponseDto predictResult) {
+        MbtiPredictedDto response = new MbtiPredictedDto();
+        response.setStatus(200);
+        response.setSuccess(true);
+        response.setSuccess(true);
+        response.setMessage("인스타그램 mbti 분석 성공");
+        response.setMbti(predictResult.getMbti());
+        response.setProb(predictResult.getProb());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

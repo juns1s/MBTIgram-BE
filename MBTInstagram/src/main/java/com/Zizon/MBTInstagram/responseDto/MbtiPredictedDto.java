@@ -3,12 +3,14 @@ package com.Zizon.MBTInstagram.responseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Data
 @NoArgsConstructor
 public class MbtiPredictedDto extends ApiResponseDto{
     private String mbti;
+    private Map<String, Double> prob;
 
     public MbtiPredictedDto(int status, boolean success, String message, String mbti) {
         super(status, success, message);

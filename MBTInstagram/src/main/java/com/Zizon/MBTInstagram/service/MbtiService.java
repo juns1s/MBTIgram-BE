@@ -1,11 +1,12 @@
 package com.Zizon.MBTInstagram.service;
 
+import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.global.exception.NoAccountException;
 import com.Zizon.MBTInstagram.global.exception.NoPostException;
 import com.Zizon.MBTInstagram.global.exception.PrivateAccountException;
-import com.Zizon.MBTInstagram.requestDto.MbtiInstagramRequestDto;
-import com.Zizon.MBTInstagram.requestDto.MbtiTextRequestDto;
+import com.Zizon.MBTInstagram.flaskDto.MbtiInstagramRequestDto;
+import com.Zizon.MBTInstagram.flaskDto.MbtiTextRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,13 +24,9 @@ public class MbtiService {
     @Value("${Python.url}")
     private String pythonServerUrl;
 
-    public String predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
+    public FlaskResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
-
-        //헤더 설정
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         MbtiInstagramRequestDto requestDto = new MbtiInstagramRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -51,35 +46,26 @@ public class MbtiService {
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
 
-            // String to Object
-            TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
+            // JSON을 클래스로 변경
 
-            return response.mbti;
+            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
-            if(httpStatus.equals("400")){
-                throw new NoPostException();
-            }
-            else if(httpStatus.equals("404")){
-                throw new NoAccountException();
-            }
-            else if(httpStatus.equals("401")){
-                throw new PrivateAccountException();
-            }
-            else if(httpStatus.equals("500")){
-                throw new RuntimeException();
+            switch (httpStatus) {
+                case "400" -> throw new NoPostException();
+                case "404" -> throw new NoAccountException();
+                case "401" -> throw new PrivateAccountException();
+                case "500" -> throw new RuntimeException();
+                default -> {
+                }
             }
         }
         return null;
     }
 
-    public String predictMbtiByText(String text) throws Exception {
+    public FlaskResponseDto predictMbtiByText(String text) throws Exception {
         log.info("Text: " + text);
-
-        //헤더 설정
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         MbtiTextRequestDto requestDto = new MbtiTextRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -100,9 +86,8 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // String to Object
-            TestResponse response = objectMapper.readValue(responseEntity.getBody(), TestResponse.class);
 
-            return response.mbti;
+            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
@@ -111,9 +96,5 @@ public class MbtiService {
             }
         }
         return null;
-    }
-
-    private static class TestResponse{
-        public String mbti;
     }
 }

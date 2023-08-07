@@ -1,4 +1,4 @@
-package com.Zizon.MBTInstagram.requestDto;
+package com.Zizon.MBTInstagram.flaskDto;
 
 import lombok.Data;
 
