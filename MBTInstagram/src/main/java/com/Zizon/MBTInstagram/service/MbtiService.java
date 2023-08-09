@@ -2,6 +2,7 @@ package com.Zizon.MBTInstagram.service;
 
 import com.Zizon.MBTInstagram.domain.MbtiViews;
 import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
+import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.global.exception.NoAccountException;
 import com.Zizon.MBTInstagram.global.exception.NoPostException;
@@ -17,13 +18,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class MbtiService {
 
     private final MbtiViewsRepository mbtiTypeRepository;
@@ -107,5 +111,13 @@ public class MbtiService {
 
     public ArrayList<MbtiViews> allMbtiOrderByCount(){
         return mbtiTypeRepository.findAll(Sort.by(Sort.Direction.DESC, "count"));
+    }
+
+    @Transactional
+    public int addViews(MbtiType mbtiType){
+        Optional<MbtiViews> optionalMbtiViews = mbtiTypeRepository.findByType(mbtiType);
+        MbtiViews mbtiViews = optionalMbtiViews.get();
+        mbtiViews.addCount();
+        return mbtiViews.getCount();
     }
 }
