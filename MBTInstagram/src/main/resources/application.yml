@@ -33,7 +33,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-      default_batch_fetch_size: 100
     properties:
       hibernate:
         format_sql: true
