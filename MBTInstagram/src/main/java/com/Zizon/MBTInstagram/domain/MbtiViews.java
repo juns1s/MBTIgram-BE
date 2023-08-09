@@ -1,6 +1,9 @@
 package com.Zizon.MBTInstagram.domain;
 
+import com.Zizon.MBTInstagram.global.MbtiType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,13 +11,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
-public class MbtiType {
+public class MbtiViews {
 
     @Id
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private MbtiType type;
     private int count;
 
-    public MbtiType(String mbtiType){
+    public MbtiViews(MbtiType mbtiType){
         this.type = mbtiType;
         this.count = 0;
     }
