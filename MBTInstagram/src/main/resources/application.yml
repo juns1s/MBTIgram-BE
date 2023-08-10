@@ -38,22 +38,21 @@ spring:
         format_sql: true
 
 ---
-#
-#spring:
-#  config:
-#    activate:
-#      on-profile: mysql
-#
-#  datasource:
-#    url: jdbc:mysql://gooroom-db.cwfs4j4gmmfx.ap-northeast-2.rds.amazonaws.com:3306/gooroom_db
-#    username: p3j1
-#    password: wjdghkswldkstndudwnstj
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#
-#  jpa:
-#    hibernate:
-#      ddl-auto: create-drop
-#      default_batch_fetch_size: 100
-#    properties:현
-#      hibernate:
-#        format_sql: true
+
+spring:
+  config:
+    activate:
+      on-profile: mysql
+
+  datasource:
+    url: jdbc:mysql://mbtigram-db-ft.cwfs4j4gmmfx.ap-northeast-2.rds.amazonaws.com:3306/mbtigram_db_ft
+    username: mbtigram
+    password: guswldbalswnstjdbrud
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
