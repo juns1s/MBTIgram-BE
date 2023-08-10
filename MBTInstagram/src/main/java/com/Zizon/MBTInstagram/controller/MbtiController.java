@@ -91,15 +91,14 @@ public class MbtiController {
         response.setMessage("인스타그램 mbti 분석 성공");
         response.setMbti(predictResult.getMbti());
         response.setProb(sortByValuesDescending(predictResult.getProb()));
-        System.out.println(sortByValuesDescending(predictResult.getProb()));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public static Map<String, Double> sortByValuesDescending(Map<String, Double> map) {
-        List<Map.Entry<String, Double>> list = new ArrayList<>(map.entrySet());
-        list.sort(Map.Entry.<String, Double>comparingByValue().reversed());
-        Map<String, Double> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Double> entry : list) {
+    public static <T extends Number & Comparable<? super T>> Map<String, T> sortByValuesDescending(Map<String, T> map) {
+        List<Map.Entry<String, T>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.<String, T>comparingByValue().reversed());
+        Map<String, T> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, T> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;
