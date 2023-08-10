@@ -1,4 +1,14 @@
 spring:
+  profiles:
+    group:
+      dev:
+        - h2
+      prod:
+        - mysql
+
+---
+
+spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -7,3 +17,42 @@ Python:
   url: "http://localhost:5000/"
 CORS:
   urls: "https://stately-florentine-57e556.netlify.app/"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/mbtigram
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: mysql
+
+  datasource:
+    url: jdbc:mysql://mbtigram-db-ft.cwfs4j4gmmfx.ap-northeast-2.rds.amazonaws.com:3306/mbtigram_db_ft
+    username: mbtigram
+    password: guswldbalswnstjdbrud
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true

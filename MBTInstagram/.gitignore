@@ -43,3 +43,7 @@ out/
 /src/main/resources/static/
 /src/main/resources/templates/
 /src/main/resources/
+/src/test/
+
+### application.yml ###
+/src/main/resources/application.yml
