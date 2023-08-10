@@ -1,5 +1,6 @@
 package com.Zizon.MBTInstagram.controller;
 
+import com.Zizon.MBTInstagram.domain.MbtiViews;
 import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
 import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
@@ -7,6 +8,7 @@ import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
 import com.Zizon.MBTInstagram.responseDto.ExceptionDto;
 import com.Zizon.MBTInstagram.responseDto.MbtiPredictedDto;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
+import com.Zizon.MBTInstagram.responseDto.RankingResponseDto;
 import com.Zizon.MBTInstagram.service.MbtiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,6 +77,20 @@ public class MbtiController {
         }
     }
 
+    @GetMapping("/rank")
+    public ResponseEntity<RankingResponseDto> getRanking(){
+        ArrayList<MbtiViews> mbtiViews = mbtiService.allMbtiOrderByCount();
+        RankingResponseDto responseDto = new RankingResponseDto();
+        Map<String, Integer> tmpMap = new HashMap<>();
+        for(MbtiViews mbti: mbtiViews){
+            tmpMap.put(mbti.getType().mbti, mbti.getCount());
+        }
+        responseDto.setStatus(200);
+        responseDto.setSuccess(true);
+        responseDto.setMessage("mbti별 랭킹 조회 성공");
+        responseDto.setRank(sortByValuesDescending(tmpMap));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
 
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
