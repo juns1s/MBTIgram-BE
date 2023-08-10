@@ -1,6 +1,7 @@
 package com.Zizon.MBTInstagram.controller;
 
 import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
+import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
 import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
 import com.Zizon.MBTInstagram.responseDto.ExceptionDto;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -22,14 +24,24 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class MbtiController {
 
     private final MbtiService mbtiService;
 
     @GetMapping("/sns/instagram")
+    @Transactional
     public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
             FlaskResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
+            String mbtiResult = predictResult.getMbti();
+
+            for (MbtiType type: MbtiType.values()) {
+                if(type.mbti.equals(mbtiResult)){
+                    int cnt = mbtiService.addViews(type);
+                    System.out.println("cnt = " + cnt);
+                }
+            }
 
             return responsePredictResult(predictResult);
 
@@ -45,9 +57,18 @@ public class MbtiController {
     }
 
     @GetMapping("/sns/introduction")
+    @Transactional
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
             FlaskResponseDto predictResult = mbtiService.predictMbtiByText(text);
+
+            String mbtiResult = predictResult.getMbti();
+
+            for (MbtiType type: MbtiType.values()) {
+                if(type.mbti.equals(mbtiResult)){
+                    mbtiService.addViews(type);
+                }
+            }
 
             return responsePredictResult(predictResult);
         } catch (Exception e){
@@ -56,6 +77,7 @@ public class MbtiController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
