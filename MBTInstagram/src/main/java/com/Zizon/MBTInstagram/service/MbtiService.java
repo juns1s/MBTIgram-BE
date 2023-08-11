@@ -35,6 +35,7 @@ public class MbtiService {
     @Value("${Python.url}")
     private String pythonServerUrl;
 
+    @Transactional
     public FlaskResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
@@ -58,8 +59,10 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // JSON을 클래스로 변경
-
-            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
+            FlaskResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
+            MbtiType mbtiType = MbtiType.fromString(responseDto.getMbti());
+            addViews(mbtiType);
+            return responseDto;
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 

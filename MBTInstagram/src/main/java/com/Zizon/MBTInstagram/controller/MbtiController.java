@@ -33,14 +33,6 @@ public class MbtiController {
     public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
             FlaskResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
-            String mbtiResult = predictResult.getMbti();
-
-            for (MbtiType type: MbtiType.values()) {
-                if(type.mbti.equals(mbtiResult)){
-                    int cnt = mbtiService.addViews(type);
-                    System.out.println("cnt = " + cnt);
-                }
-            }
 
             return responsePredictResult(predictResult);
 
