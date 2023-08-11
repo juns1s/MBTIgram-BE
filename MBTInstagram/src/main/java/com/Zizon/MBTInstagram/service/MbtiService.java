@@ -7,10 +7,7 @@ import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.global.exception.NoAccountException;
 import com.Zizon.MBTInstagram.global.exception.NoPostException;
 import com.Zizon.MBTInstagram.global.exception.PrivateAccountException;
-import com.Zizon.MBTInstagram.flaskDto.MbtiInstagramRequestDto;
-import com.Zizon.MBTInstagram.flaskDto.MbtiTextRequestDto;
 import com.Zizon.MBTInstagram.repository.MbtiViewsRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,21 +36,13 @@ public class MbtiService {
     public FlaskResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
-
-        MbtiInstagramRequestDto requestDto = new MbtiInstagramRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
-
-        // Object Mapper를 통한 JSON 바인딩
-        requestDto.setSnsUrl(url);
-        String params = objectMapper.writeValueAsString(requestDto);
-        JsonNode jsonNode = objectMapper.readTree(params);
-        String snsUrl = jsonNode.get("snsUrl").asText();
 
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
         try {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-                    pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + snsUrl, String.class);
+                    pythonServerUrl + snsType.getSnsType() + "?snsUrl=" + url, String.class);
 
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
@@ -78,29 +67,23 @@ public class MbtiService {
         return null;
     }
 
-    public FlaskResponseDto predictMbtiByText(String text) throws Exception {
+
+    public FlaskResponseDto predictMbtiByText(String text){
         log.info("Text: " + text);
 
-        MbtiTextRequestDto requestDto = new MbtiTextRequestDto();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Object Mapper를 통한 JSON 바인딩
-        requestDto.setText(text);
-        String params = objectMapper.writeValueAsString(requestDto);
-        JsonNode jsonNode = objectMapper.readTree(params);
-        String introduction = jsonNode.get("text").asText();
 
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
         try {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-                    pythonServerUrl + "introduction" + "?text=" + introduction, String.class);
+                    pythonServerUrl + "introduction" + "?text=" + text, String.class);
 
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
 
             // String to Object
-
             return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
