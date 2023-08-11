@@ -81,7 +81,10 @@ public class MbtiService {
             queryString.append("&");
         }
         queryString.append(idCnt-1);
+        queryString.append("=");
         queryString.append(idLIst.get(idCnt-1));
+
+        System.out.println("queryString = " + queryString);
         
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
