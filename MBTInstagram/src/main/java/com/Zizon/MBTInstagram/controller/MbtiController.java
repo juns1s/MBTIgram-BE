@@ -1,15 +1,15 @@
 package com.Zizon.MBTInstagram.controller;
 
 import com.Zizon.MBTInstagram.domain.MbtiViews;
-import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
+import com.Zizon.MBTInstagram.global.exception.LessThanTwoException;
+import com.Zizon.MBTInstagram.pythonServerDto.PythonMbtiResponseDto;
 import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
-import com.Zizon.MBTInstagram.responseDto.ApiResponseDto;
-import com.Zizon.MBTInstagram.responseDto.ExceptionDto;
-import com.Zizon.MBTInstagram.responseDto.MbtiPredictedDto;
+import com.Zizon.MBTInstagram.responseDto.*;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
-import com.Zizon.MBTInstagram.responseDto.RankingResponseDto;
 import com.Zizon.MBTInstagram.service.MbtiService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,21 +32,60 @@ public class MbtiController {
     @Transactional
     public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
         try{
-            FlaskResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
-            String mbtiResult = predictResult.getMbti();
-
-            for (MbtiType type: MbtiType.values()) {
-                if(type.mbti.equals(mbtiResult)){
-                    int cnt = mbtiService.addViews(type);
-                    System.out.println("cnt = " + cnt);
-                }
-            }
+            PythonMbtiResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
 
             return responsePredictResult(predictResult);
 
         }catch (CustomException e) {
             log.error(String.valueOf((e.getHttpStatus())));
-            ApiResponseDto response = new ExceptionDto(e.getHttpStatus(), e.getMessage());
+            ApiResponseDto response = new ExceptionResponseDto(e.getHttpStatus(), e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
+        } catch (Exception e){
+            log.error(e.getMessage());
+            ApiResponseDto response = new ApiResponseDto(500, false, "서버 내 오류");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/sns/instagram/chemistry")
+    public ResponseEntity<ApiResponseDto> chemistryPredict(@Valid @RequestParam(required = false) String id0,
+                                                           @Valid @RequestParam(required = false) String id1,
+                                                           @Valid @RequestParam(required = false) String id2,
+                                                           @Valid @RequestParam(required = false) String id3,
+                                                           @Valid @RequestParam(required = false) String id4){
+        try{
+            List<String> idList = new ArrayList<>();
+            if(id0 != null)
+                idList.add(id0);
+            if(id1 != null)
+                idList.add(id1);
+            if(id2 != null)
+                idList.add(id2);
+            if(id3 != null)
+                idList.add(id3);
+            if(id4 != null)
+                idList.add(id4);
+
+            if(idList.size()<2){
+                throw new LessThanTwoException();
+            }
+
+            String chemistryJson = mbtiService.predictChemistryByInstagram(idList);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode jsonNode = objectMapper.readTree(chemistryJson);
+
+            ChemistryResponseDto responseDto = new ChemistryResponseDto();
+            responseDto.setStatus(200);
+            responseDto.setSuccess(true);
+            responseDto.setMessage("각 mbti및 궁합 조회 성공");
+            responseDto.setData(jsonNode);
+            return new ResponseEntity<>(responseDto, HttpStatus.OK);
+
+        } catch (CustomException e) {
+            log.error(String.valueOf((e.getHttpStatus())));
+            ApiResponseDto response = new ExceptionResponseDto(e.getHttpStatus(), e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
         } catch (Exception e){
             log.error(e.getMessage());
@@ -59,7 +98,7 @@ public class MbtiController {
     @Transactional
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
-            FlaskResponseDto predictResult = mbtiService.predictMbtiByText(text);
+            PythonMbtiResponseDto predictResult = mbtiService.predictMbtiByText(text);
 
             String mbtiResult = predictResult.getMbti();
 
@@ -96,7 +135,7 @@ public class MbtiController {
     @ResponseStatus(HttpStatus.OK)
     public void healthCheck(){}
 
-    private ResponseEntity<ApiResponseDto> responsePredictResult(FlaskResponseDto predictResult) {
+    private ResponseEntity<ApiResponseDto> responsePredictResult(PythonMbtiResponseDto predictResult) {
         MbtiPredictedDto response = new MbtiPredictedDto();
         response.setStatus(200);
         response.setSuccess(true);

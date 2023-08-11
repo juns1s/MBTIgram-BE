@@ -1,5 +1,8 @@
 package com.Zizon.MBTInstagram.global;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum MbtiType {
 
     ISTJ("ISTJ"),
@@ -22,5 +25,17 @@ public enum MbtiType {
     public final String mbti;
     MbtiType(String type) {
         this.mbti = type;
+    }
+
+    private static final Map<String, MbtiType> stringToEnum = new HashMap<>();
+
+    static {
+        for (MbtiType mbtiType : values()) {
+            stringToEnum.put(mbtiType.mbti, mbtiType);
+        }
+    }
+
+    public static MbtiType fromString(String type) {
+        return stringToEnum.get(type);
     }
 }
