@@ -1,6 +1,7 @@
 package com.Zizon.MBTInstagram.controller;
 
 import com.Zizon.MBTInstagram.domain.MbtiViews;
+import com.Zizon.MBTInstagram.global.exception.LessThanTwoException;
 import com.Zizon.MBTInstagram.pythonServerDto.PythonMbtiResponseDto;
 import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
@@ -12,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,25 +47,28 @@ public class MbtiController {
         }
     }
 
-    @GetMapping("/chemistry")
-    public ResponseEntity<ApiResponseDto> chemistryPredict(@Valid @RequestParam @DefaultValue(value = "") String id0,
-                                                           @Valid @RequestParam @DefaultValue(value = "") String id1,
-                                                           @Valid @RequestParam @DefaultValue(value = "") String id2,
-                                                           @Valid @RequestParam @DefaultValue(value = "") String id3,
-                                                           @Valid @RequestParam @DefaultValue(value = "") String id4){
+    @GetMapping("/sns/instagram/chemistry")
+    public ResponseEntity<ApiResponseDto> chemistryPredict(@Valid @RequestParam(required = false) String id0,
+                                                           @Valid @RequestParam(required = false) String id1,
+                                                           @Valid @RequestParam(required = false) String id2,
+                                                           @Valid @RequestParam(required = false) String id3,
+                                                           @Valid @RequestParam(required = false) String id4){
         try{
             List<String> idList = new ArrayList<>();
-            if(!id0.equals(""))
+            if(id0 != null)
                 idList.add(id0);
-            if(!id1.equals(""))
+            if(id1 != null)
                 idList.add(id1);
-            if(!id2.equals(""))
+            if(id2 != null)
                 idList.add(id2);
-            if(!id3.equals(""))
+            if(id3 != null)
                 idList.add(id3);
-            if(!id4.equals(""))
+            if(id4 != null)
                 idList.add(id4);
-            System.out.println("idList = " + idList);
+
+            if(idList.size()<2){
+                throw new LessThanTwoException();
+            }
 
             String chemistryJson = mbtiService.predictChemistryByInstagram(idList);
 
