@@ -1,7 +1,7 @@
 package com.Zizon.MBTInstagram.service;
 
 import com.Zizon.MBTInstagram.domain.MbtiViews;
-import com.Zizon.MBTInstagram.flaskDto.FlaskResponseDto;
+import com.Zizon.MBTInstagram.pythonServerDto.PythonMbtiResponseDto;
 import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.global.exception.NoAccountException;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,7 +34,7 @@ public class MbtiService {
     private String pythonServerUrl;
 
     @Transactional
-    public FlaskResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
+    public PythonMbtiResponseDto predictMbtiByInstagram(SnsType snsType, String url) throws Exception {
 
         log.info("SNS URL: " + url);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +49,7 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // JSON을 클래스로 변경
-            FlaskResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
+            PythonMbtiResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), PythonMbtiResponseDto.class);
             MbtiType mbtiType = MbtiType.fromString(responseDto.getMbti());
             addViews(mbtiType);
             return responseDto;
@@ -67,8 +68,48 @@ public class MbtiService {
         return null;
     }
 
+    @Transactional
+    public String predictChemistryByInstagram(List<String> idLIst) throws Exception {
+        int idCnt = idLIst.size();
+        StringBuilder queryString = new StringBuilder();
+        queryString.append("?");
 
-    public FlaskResponseDto predictMbtiByText(String text){
+        for(int i=0; i<idCnt-1; i++){
+            queryString.append(i);
+            queryString.append("=");
+            queryString.append(idLIst.get(i));
+            queryString.append("&");
+        }
+        queryString.append(idCnt-1);
+        queryString.append(idLIst.get(idCnt-1));
+        
+        // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+                    pythonServerUrl + "/chemistry" + queryString, String.class);
+
+            // 요청 후 응답 확인
+            log.info(responseEntity.getBody());
+
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            String httpStatus = e.getMessage().substring(0,3);
+
+            switch (httpStatus) {
+                case "400" -> throw new NoPostException();
+                case "404" -> throw new NoAccountException();
+                case "401" -> throw new PrivateAccountException();
+                case "500" -> throw new RuntimeException();
+                default -> {
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public PythonMbtiResponseDto predictMbtiByText(String text){
         log.info("Text: " + text);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -84,7 +125,7 @@ public class MbtiService {
             log.info(responseEntity.getBody());
 
             // String to Object
-            return objectMapper.readValue(responseEntity.getBody(), FlaskResponseDto.class);
+            return objectMapper.readValue(responseEntity.getBody(), PythonMbtiResponseDto.class);
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
 
