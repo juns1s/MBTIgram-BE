@@ -1,6 +1,7 @@
 package com.Zizon.MBTInstagram.service;
 
 import com.Zizon.MBTInstagram.domain.MbtiViews;
+import com.Zizon.MBTInstagram.pythonServerDto.PythonChemistryResponseDto;
 import com.Zizon.MBTInstagram.pythonServerDto.PythonMbtiResponseDto;
 import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
@@ -50,8 +51,7 @@ public class MbtiService {
 
             // JSON을 클래스로 변경
             PythonMbtiResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), PythonMbtiResponseDto.class);
-            MbtiType mbtiType = MbtiType.fromString(responseDto.getMbti());
-            addViews(mbtiType);
+            addViews(responseDto.getMbti());
             return responseDto;
         } catch (Exception e) {
             String httpStatus = e.getMessage().substring(0,3);
@@ -85,8 +85,6 @@ public class MbtiService {
         queryString.append(idCnt-1);
         queryString.append("=");
         queryString.append(idLIst.get(idCnt-1));
-
-        System.out.println("queryString = " + queryString);
         
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
@@ -96,6 +94,13 @@ public class MbtiService {
 
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            PythonChemistryResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), PythonChemistryResponseDto.class);
+
+            for(String mbti: responseDto.getMember_mbti()){
+                addViews(mbti);
+            }
 
             return responseEntity.getBody();
         } catch (Exception e) {
@@ -119,7 +124,6 @@ public class MbtiService {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-
         // 파이썬 서버에 쿼리스트링을 통해 URL 분석 GET 요청
         RestTemplate restTemplate = new RestTemplate();
         try {
@@ -128,6 +132,9 @@ public class MbtiService {
 
             // 요청 후 응답 확인
             log.info(responseEntity.getBody());
+
+            PythonMbtiResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), PythonMbtiResponseDto.class);
+            addViews(responseDto.getMbti());
 
             // String to Object
             return objectMapper.readValue(responseEntity.getBody(), PythonMbtiResponseDto.class);
@@ -146,7 +153,8 @@ public class MbtiService {
     }
 
     @Transactional
-    public int addViews(MbtiType mbtiType){
+    public int addViews(String mbti){
+        MbtiType mbtiType = MbtiType.fromString(mbti);
         Optional<MbtiViews> optionalMbtiViews = mbtiTypeRepository.findByType(mbtiType);
         MbtiViews mbtiViews = optionalMbtiViews.get();
         mbtiViews.addCount();
