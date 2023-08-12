@@ -75,11 +75,13 @@ public class MbtiService {
         queryString.append("?");
 
         for(int i=0; i<idCnt-1; i++){
+            queryString.append("id");
             queryString.append(i);
             queryString.append("=");
             queryString.append(idLIst.get(i));
             queryString.append("&");
         }
+        queryString.append("id");
         queryString.append(idCnt-1);
         queryString.append("=");
         queryString.append(idLIst.get(idCnt-1));
