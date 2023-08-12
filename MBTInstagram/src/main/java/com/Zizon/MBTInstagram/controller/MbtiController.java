@@ -47,6 +47,7 @@ public class MbtiController {
     }
 
     @GetMapping("/sns/instagram/chemistry")
+    @Transactional
     public ResponseEntity<ApiResponseDto> chemistryPredict(@Valid @RequestParam(required = false) String id0,
                                                            @Valid @RequestParam(required = false) String id1,
                                                            @Valid @RequestParam(required = false) String id2,
