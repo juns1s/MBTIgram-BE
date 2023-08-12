@@ -3,7 +3,6 @@ package com.Zizon.MBTInstagram.controller;
 import com.Zizon.MBTInstagram.domain.MbtiViews;
 import com.Zizon.MBTInstagram.global.exception.LessThanTwoException;
 import com.Zizon.MBTInstagram.pythonServerDto.PythonMbtiResponseDto;
-import com.Zizon.MBTInstagram.global.MbtiType;
 import com.Zizon.MBTInstagram.global.exception.CustomException;
 import com.Zizon.MBTInstagram.responseDto.*;
 import com.Zizon.MBTInstagram.global.embedded.SnsType;
@@ -99,14 +98,6 @@ public class MbtiController {
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
             PythonMbtiResponseDto predictResult = mbtiService.predictMbtiByText(text);
-
-            String mbtiResult = predictResult.getMbti();
-
-            for (MbtiType type: MbtiType.values()) {
-                if(type.mbti.equals(mbtiResult)){
-                    mbtiService.addViews(type);
-                }
-            }
 
             return responsePredictResult(predictResult);
         } catch (Exception e){
