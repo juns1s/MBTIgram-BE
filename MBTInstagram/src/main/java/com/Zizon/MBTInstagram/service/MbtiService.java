@@ -119,6 +119,7 @@ public class MbtiService {
     }
 
 
+    @Transactional
     public PythonMbtiResponseDto predictMbtiByText(String text){
         log.info("Text: " + text);
 
