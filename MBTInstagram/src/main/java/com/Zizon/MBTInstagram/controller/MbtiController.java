@@ -9,6 +9,14 @@ import com.Zizon.MBTInstagram.global.embedded.SnsType;
 import com.Zizon.MBTInstagram.service.MbtiService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Tag(name = "MBTIgram API", description = "MBTIgram API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -27,9 +36,16 @@ public class MbtiController {
 
     private final MbtiService mbtiService;
 
+    @Operation(summary = "인스타그램 MBTI예측", description = "인스타그램 계정의 게시글 텍스트를 추출하여 MBTI를 예측합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "MBTI 조회 성공", content = @Content(schema = @Schema(implementation = MbtiPredictedDto.class))),
+            @ApiResponse(responseCode = "400", description = "게시글이 없는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "비공개 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))})
     @GetMapping("/sns/instagram")
     @Transactional
-    public ResponseEntity<ApiResponseDto> instagramPredict(@Valid @RequestParam String snsUrl){
+    public ResponseEntity<ApiResponseDto> instagramPredict(@Parameter(name = "snsUrl", description = "인스타그램 id")
+                                                               @Valid @RequestParam String snsUrl){
         try{
             PythonMbtiResponseDto predictResult = mbtiService.predictMbtiByInstagram(SnsType.INSTAGRAM, snsUrl);
 
@@ -46,13 +62,19 @@ public class MbtiController {
         }
     }
 
+    @Operation(summary = "MBTI별 궁합 조회", description = "최대 5명의 인스타그램 계정의 게시글 텍스트를 추출하여 MBTI를 예측 후 MBTI별 궁합을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "궁합 조회 성공", content = @Content(schema = @Schema(implementation = ChemistryResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "게시글이 없는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "비공개 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))})
     @GetMapping("/sns/instagram/chemistry")
     @Transactional
-    public ResponseEntity<ApiResponseDto> chemistryPredict(@Valid @RequestParam(required = false) String id0,
-                                                           @Valid @RequestParam(required = false) String id1,
-                                                           @Valid @RequestParam(required = false) String id2,
-                                                           @Valid @RequestParam(required = false) String id3,
-                                                           @Valid @RequestParam(required = false) String id4){
+    public ResponseEntity<ApiResponseDto> chemistryPredict(@Parameter(name = "id0", description = "인스타그램 id0")@Valid @RequestParam(required = false) String id0,
+                                                           @Parameter(name = "id1", description = "인스타그램 id1")@Valid @RequestParam(required = false) String id1,
+                                                           @Parameter(name = "id2", description = "인스타그램 id2")@Valid @RequestParam(required = false) String id2,
+                                                           @Parameter(name = "id3", description = "인스타그램 id3")@Valid @RequestParam(required = false) String id3,
+                                                           @Parameter(name = "id4", description = "인스타그램 id4")@Valid @RequestParam(required = false) String id4){
         try{
             List<String> idList = new ArrayList<>();
             if(id0 != null)
@@ -94,6 +116,7 @@ public class MbtiController {
         }
     }
 
+    @Hidden
     @GetMapping("/sns/introduction")
     @Transactional
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
@@ -108,6 +131,7 @@ public class MbtiController {
         }
     }
 
+    @Operation(summary = "MBTI별 랭킹", description = "MBTI별 조회수에 대한 누적 랭킹을 조회합니다.")
     @GetMapping("/rank")
     public ResponseEntity<RankingResponseDto> getRanking(){
         ArrayList<MbtiViews> mbtiViews = mbtiService.allMbtiOrderByCount();
@@ -123,6 +147,7 @@ public class MbtiController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @Hidden
     @GetMapping("/healthCheck")
     @ResponseStatus(HttpStatus.OK)
     public void healthCheck(){}
@@ -138,7 +163,7 @@ public class MbtiController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public static <T extends Number & Comparable<? super T>> Map<String, T> sortByValuesDescending(Map<String, T> map) {
+    private static <T extends Number & Comparable<? super T>> Map<String, T> sortByValuesDescending(Map<String, T> map) {
         List<Map.Entry<String, T>> list = new ArrayList<>(map.entrySet());
         list.sort(Map.Entry.<String, T>comparingByValue().reversed());
         Map<String, T> sortedMap = new LinkedHashMap<>();
