@@ -52,7 +52,6 @@ public class MbtiController {
             return responsePredictResult(predictResult);
 
         }catch (CustomException e) {
-            log.error(String.valueOf((e.getHttpStatus())));
             ApiResponseDto response = new ExceptionResponseDto(e.getHttpStatus(), e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
         } catch (Exception e){
@@ -106,7 +105,6 @@ public class MbtiController {
             return new ResponseEntity<>(responseDto, HttpStatus.OK);
 
         } catch (CustomException e) {
-            log.error(String.valueOf((e.getHttpStatus())));
             ApiResponseDto response = new ExceptionResponseDto(e.getHttpStatus(), e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.resolve(e.getHttpStatus()));
         } catch (Exception e){
