@@ -15,6 +15,6 @@ import java.sql.SQLTransientException;
 public class SqlExceptionHandler {
     @ExceptionHandler(SQLTransientConnectionException.class)
     public ResponseEntity<ApiResponseDto> handleSQLException(SQLTransientException e){
-        return new ResponseEntity<>(new ApiResponseDto(500, false, "HikariPool-1 - Connection is not available, request timed out"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ApiResponseDto(500, false, "서버 내 오류"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
