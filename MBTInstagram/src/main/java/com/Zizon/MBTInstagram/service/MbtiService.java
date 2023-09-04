@@ -174,7 +174,7 @@ public class MbtiService {
         for(String mbti: mbtiSet){
             Optional<MbtiViews> optionalMbtiViews = mbtiTypeRepository.findByType(MbtiType.fromString(mbti));
             MbtiViews mbtiViews = optionalMbtiViews.get();
-            mbtiViews.addNCount(mbtiMap.get(mbti).intValue());
+            mbtiViews.addNCount(mbtiMap.get(mbti));
         }
     }
 }
