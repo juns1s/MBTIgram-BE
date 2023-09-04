@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -98,9 +96,7 @@ public class MbtiService {
             ObjectMapper objectMapper = new ObjectMapper();
             PythonChemistryResponseDto responseDto = objectMapper.readValue(responseEntity.getBody(), PythonChemistryResponseDto.class);
 
-            for(String mbti: responseDto.getMember_mbti()){
-                addViews(mbti);
-            }
+            addViewsList(responseDto.getMember_mbti());
 
             return responseEntity.getBody();
         } catch (Exception e) {
@@ -160,5 +156,25 @@ public class MbtiService {
         MbtiViews mbtiViews = optionalMbtiViews.get();
         mbtiViews.addCount();
         return mbtiViews.getCount();
+    }
+
+    @Transactional
+    public void addViewsList(List<String> mbtiList){
+        Map<String, Integer> mbtiMap = new HashMap<>();
+        for(String mbti: mbtiList){
+            Integer cnt = mbtiMap.get(mbti);
+            if(cnt == null){
+                mbtiMap.put(mbti, 1);
+                continue;
+            }
+            cnt+=1;
+            mbtiMap.put(mbti, cnt);
+        }
+        Set<String> mbtiSet = mbtiMap.keySet();
+        for(String mbti: mbtiSet){
+            Optional<MbtiViews> optionalMbtiViews = mbtiTypeRepository.findByType(MbtiType.fromString(mbti));
+            MbtiViews mbtiViews = optionalMbtiViews.get();
+            mbtiViews.addNCount(mbtiMap.get(mbti).intValue());
+        }
     }
 }
