@@ -26,4 +26,8 @@ public class MbtiViews {
     public void addCount(){
         this.count += 1;
     }
+
+    public void addNCount(int n){
+        this.count+=n;
+    }
 }
