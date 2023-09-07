@@ -31,7 +31,6 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 public class MbtiController {
 
     private final MbtiService mbtiService;
@@ -43,7 +42,6 @@ public class MbtiController {
             @ApiResponse(responseCode = "401", description = "비공개 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))})
     @GetMapping("/sns/instagram")
-    @Transactional
     public ResponseEntity<ApiResponseDto> instagramPredict(@Parameter(name = "snsUrl", description = "인스타그램 id")
                                                                @Valid @RequestParam String snsUrl){
         try{
@@ -68,7 +66,6 @@ public class MbtiController {
             @ApiResponse(responseCode = "401", description = "비공개 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 계정 조회", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))})
     @GetMapping("/sns/instagram/chemistry")
-    @Transactional
     public ResponseEntity<ApiResponseDto> chemistryPredict(@Parameter(name = "id0", description = "인스타그램 id0")@Valid @RequestParam(required = false) String id0,
                                                            @Parameter(name = "id1", description = "인스타그램 id1")@Valid @RequestParam(required = false) String id1,
                                                            @Parameter(name = "id2", description = "인스타그램 id2")@Valid @RequestParam(required = false) String id2,
@@ -116,7 +113,6 @@ public class MbtiController {
 
     @Hidden
     @GetMapping("/sns/introduction")
-    @Transactional
     public ResponseEntity<ApiResponseDto> introductionPredict(@Valid @RequestParam String text) {
         try{
             PythonMbtiResponseDto predictResult = mbtiService.predictMbtiByText(text);
