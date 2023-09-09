@@ -20,7 +20,7 @@ class MbtiTypeRepositoryTest {
     private MbtiViewsRepository mbtiTypeRepository;
 
     @Test
-    public void mbti전체검색() throws Exception{
+    public void mbti전체검색(){
         //given
         MbtiViews entp = new MbtiViews(MbtiType.ENTP);
         MbtiViews entj = new MbtiViews(MbtiType.ENTJ);
